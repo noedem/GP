@@ -1,0 +1,80 @@
+<style media="screen">
+  .container-formulario {
+    height: 50px;
+    width: 350px;
+    margin-bottom: 50px;
+  }
+  .form-row {
+    font-weight: bold;
+  }
+  .button-form {
+  }
+</style>
+
+<h1> Actualizar los pesos de los indicadores </h1>
+
+<% padre = Issue.find(@issue.parent_id)%>
+<% @issues = Issue.where(parent_id: padre.id) %>
+
+<div class="row">
+  <div>
+    <%= form_tag(issues_update_valor_peso_path) do %>
+        <% @issues.each do |iss| %>
+        <%= form_for iss do |f|%>
+            <div class="container-formulario">
+            <div class="form-row">
+            <%= "#{iss.subject[0..45]}" %> <br />
+             peso:
+             <%= f.text_field :valor_peso %>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+      <div class="button-form">
+        <%= submit_tag "actualizar", class: "btn btn-primary" %> <br />
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<% total = 0 %>
+<% @issues.each do |iss| %>
+  <%if iss.valor_peso%>
+    <% total += iss.valor_peso %>
+  <%end%>
+<% end %>
+
+<% if total > 100 %>
+  <p> Error: los pesos de los indicadores deben sumar 100 </p>
+  <p> <%= total-100 %>% extra </p>
+<% end %>
+
+<% if total < 100 %>
+  <p> Error: los pesos de los indicadores deben sumar 100 </p>
+  <p> <strong> faltan <%= (total-100).abs %>% </strong> </p>
+<% end %>
+
+<!--
+<%= labelled_form_for @issue, :html => {:id => 'issue-form', :multipart => true} do |f| %>
+<%= call_hook(:view_issues_form_details_top, { :issue => @issue, :form => f }) %>
+  <div class="box">
+
+    <fieldset>
+      <h1> Actualizar pesos de los indicadores </h1>
+      <% padre = Issue.where(tracker_id: 9).last %>
+      <%  @issues = Issue.where(parent_id: padre.id) %>
+      <% @issues.each do |issue| %>
+        <p> <%= issue.subject %> </p>
+        <p> peso:  <%= text_field_tag issue.valor_peso %> </p>  <br />
+        <% if @issue.safe_attribute? 'project_id' %>
+        <p><%= f.select :project_id, project_tree_options_for_select(@issue.allowed_target_projects, :selected => @issue.project), {:required => true},
+                        :onchange => "updateIssueFrom('#{escape_javascript project_issue_form_path(@project, :id => @issue, :format => 'js')}')" %></p>
+        <% end %>
+      <% end %>
+      <%= submit_tag l(:button_submit) %>
+      <p> los pesos de los indicadores deben sumar 100 </p>
+    </fieldset>
+
+  </div>
+<% end %>
+-->
